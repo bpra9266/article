@@ -51,16 +51,21 @@ const extractArticlePageDetails = ($) =>{
 
         if (key === "wrapper_image" || key === "block_image") {
             parsedValue = extractWrapperImages($, selector,key);
-            //key = "wrapper_image";
         }
-        
+
+        if(key === 'quote'){
+            parsedValue = extractQuote($,selector);
+        }
+        if(key === 'video'){
+            parsedValue = extractVideo($,selector);
+        }
+
         if(key == "block_image" && parsedValue.length>=1){
             articlePageData["wrapper_image"] = parsedValue;
         }else{
             if(key == "block_image" && parsedValue.length==0)
                 continue;
             articlePageData[key] = parsedValue;
-            
         }
     }
     return articlePageData;
@@ -71,12 +76,14 @@ const extractArticleContents = ($, selector) => {
     for (let node of $(selector).toArray()) {
         let header = $("h2", node)?.text().trim() || null;
         if(header === null && article_content.length == 0){
-            const desc= $("p", node)?.text().trim() || null;
+            //const desc= $("p", node)?.text().trim() || null;
             let article_content_items = {
                 heading: header,
                 content: [],
             };
-            article_content_items.content.push(desc);
+            for (let data of $("p", node).toArray()){
+                article_content_items.content.push($(data).text().trim());
+            }
             article_content.push(article_content_items);
         }else{
             for (let data of $("h2,p", node).toArray()){
@@ -111,6 +118,31 @@ const extractWrapperImages = ($, selector,key) =>{
     return images;
 }
 
+const extractQuote = ($,selector) =>{
+    const quote = {};
+    for (let node of $(selector).toArray()) {
+        const tweetable_quote = $('.tweetable-quote',node).text() || null;
+        const author = $('.tweetable-quote-author',node).text() || null;
+        const title = $('.tweetable-quote-author-title',node).text() || null;
+        quote["tweetable_quote"]=tweetable_quote;
+        quote["author"]=author;
+        quote["title"]=title;
+    }
+    return quote;
+}
+
+const extractVideo = ($,selector)=>{
+    const videoLink = {};
+    $('iframe',selector).each((index, element) => {
+        const $element = $(element);
+        videoLink['src']= $element.attr('src');
+        videoLink['title'] = $element.attr('title');
+        videoLink['width'] = $element.attr('width');
+        videoLink['height'] = $element.attr('height');
+    });
+    return videoLink;
+}
+
 export const writeDataToJSON = (outputFilePath, data) => {
     fs.mkdir(path.dirname(outputFilePath), { recursive: true }, (error) => {
       if (error) {
@@ -122,7 +154,7 @@ export const writeDataToJSON = (outputFilePath, data) => {
         saveFile(outputFilePath, data);
       }
     });
-  };
+};
 
 const saveFile = (outputFilePath, data) => {
     fs.writeFile(outputFilePath, JSON.stringify(data), "utf-8", (error) => {

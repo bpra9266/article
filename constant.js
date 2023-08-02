@@ -1,1 +1,1 @@
-export const BASE_URL = 'https://foodie.sysco.com/testimonials/vs-kitchen/';//'https://foodie.sysco.com/testimonials/vs-kitchen/';
+export const BASE_URL = 'https://foodie.sysco.com/testimonials/customer-community-stories/zzq-texas-craft-barbeque/';
