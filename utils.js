@@ -5,6 +5,7 @@ import { resolve } from 'path';
 import { error } from 'console';
 import './node_modules/core-js/features/array/at.js'
 import path from "path";
+import XLSX from "xlsx";
 
 export const extractArticlePageData = async(
     articleLink,
@@ -25,14 +26,14 @@ export const extractArticlePageData = async(
                     done();
                     return;
                 }
-                resolve(extractArticlePageDetails(cheerio.load(response.body)));
+                resolve(extractArticlePageDetails(cheerio.load(response.body),articleLink));
                 done();
             }
         })
     })
 }
 
-const extractArticlePageDetails = ($) =>{
+const extractArticlePageDetails = ($,articleLink) =>{
     const articlePageData = {};
 
     for(let [key,selector] of Object.entries(selectors)){
@@ -43,7 +44,11 @@ const extractArticlePageDetails = ($) =>{
         }
         
         if(key == 'hero_image'){
-            parsedValue = $(selector).find('img')[0].attribs.src || null;
+            if($(selector).find('img').length!==0){
+                parsedValue = $(selector).find('img')[0].attribs.src || null;
+            }else{
+                parsedValue = null;
+            }
         }
         if (key === "article_content") {
          parsedValue = extractArticleContents($, selector);
@@ -68,6 +73,7 @@ const extractArticlePageDetails = ($) =>{
             articlePageData[key] = parsedValue;
         }
     }
+    articlePageData['link']=articleLink;
     return articlePageData;
 }
 
@@ -95,8 +101,19 @@ const extractArticleContents = ($, selector) => {
                     };
                     article_content.push(article_content_items);
                 }else{
-                    const paragraph = $(data).text().trim() || null;
-                    article_content.at(-1).content.push(paragraph);
+                    try{
+                        const paragraph = $(data).text().trim() || null;
+                        article_content.at(-1).content.push(paragraph);
+                    }catch(ex){
+                        const paragraph = $(data).text().trim() || null;
+                        let article_content_items = {
+                            heading: null,
+                            content: [],
+                        };
+                        article_content_items.content.push(paragraph);
+                        article_content.push(article_content_items);
+                        //console.log(articleLink)
+                    }
                 }
             }
         }
@@ -133,7 +150,7 @@ const extractQuote = ($,selector) =>{
 
 const extractVideo = ($,selector)=>{
     const videoLink = {};
-    $('iframe',selector).each((index, element) => {
+    $('iframe').each((index, element) => {
         const $element = $(element);
         videoLink['src']= $element.attr('src');
         videoLink['title'] = $element.attr('title');
@@ -165,3 +182,14 @@ const saveFile = (outputFilePath, data) => {
       }
     });
 };
+
+export const readDataFromXL = async()=> {
+    const workbook = XLSX.readFile("article.xlsx");
+    const worksheet = workbook.Sheets["Sheet1"];
+    const articleList = XLSX.utils.sheet_to_json(worksheet, {
+        raw: true,
+        range: "A1:A83",
+        defval: null,
+    })
+    return articleList;
+}

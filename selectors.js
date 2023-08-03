@@ -3,10 +3,10 @@ const SELECTOR_CATEGORY_TYPE = '.article-hero-split-text>span,.article-hero-stac
 const SELECTOR_ARTICLE_SLOGAN = '.article-hero-split-text>p,.article-hero-stacked-container>p';
 const SELECTOR_HERO_IMAGE = '.article-hero-img';
 const SELECTOR_ARTICLE_CONTENT = '.pacecore-block-article-content-col';
-const SELECTOR_WRAPPER_IMAGE = '.single-image-wrapper>figure';
+const SELECTOR_WRAPPER_IMAGE = '.single-image-wrapper>figure,.wp-block-image';
 const SELECTOR_BLOCK_IMAGE = '.wp-block-image';
 const SELECTOR_QUOTE = '.quote-container';
-const SELECTOR_VIDEO = '.wp-block-pacecore-pacecore-video';
+const SELECTOR_VIDEO = '.wp-block-pacecore-pacecore-video,.video-container,.wp-block-embed__wrapper';
 
 export const selectors = {
     name: SELECTOR_CHEF_NAME,
@@ -15,7 +15,7 @@ export const selectors = {
     hero_image: SELECTOR_HERO_IMAGE,
     article_content: SELECTOR_ARTICLE_CONTENT,
     wrapper_image: SELECTOR_WRAPPER_IMAGE,
-    block_image: SELECTOR_BLOCK_IMAGE,
+    //block_image: SELECTOR_BLOCK_IMAGE,
     quote: SELECTOR_QUOTE,
     video: SELECTOR_VIDEO
 }
