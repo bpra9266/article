@@ -42,7 +42,13 @@ const extractArticlePageDetails = ($,articleLink) =>{
         if (parsedValue === "") {
             parsedValue = null;
         }
-        
+        if(key == 'wpid'){
+            $('article',selector).each((index, element) => {
+                const $element = $(element);
+                const id = $element.attr('id').substring(5);
+                parsedValue = id;
+            });
+        }
         if(key == 'hero_image'){
             if($(selector).find('img').length!==0){
                 parsedValue = $(selector).find('img')[0].attribs.src || null;
@@ -80,15 +86,36 @@ const extractArticlePageDetails = ($,articleLink) =>{
 const extractArticleContents = ($, selector) => {
     const article_content = [];
     for (let node of $(selector).toArray()) {
+        const isQuotePresent =$('.tweetable-quote',node).text() || null;
         let header = $("h2", node)?.text().trim() || null;
+        if(isQuotePresent == null)
         if(header === null && article_content.length == 0){
-            //const desc= $("p", node)?.text().trim() || null;
             let article_content_items = {
                 heading: header,
                 content: [],
+                images:[],
+                quotes:[],
+                videos:[]
             };
             for (let data of $("p", node).toArray()){
-                article_content_items.content.push($(data).text().trim());
+                const paragraph = $(data).text().trim()||null;
+                if(paragraph !== null)
+                article_content_items.content.push(paragraph);
+            }
+            const imageUrls=$('img',node);
+            if(imageUrls.length!==0){
+                const image = $('img',node)[0].attribs.src || null;
+                const caption = $('.image-caption-inner',node).text() || null;
+                const image_alt = $('img',node)[0].attribs.alt || null;
+                const image_class = $('img',node)[0].attribs.class || null;
+                const imageData = {
+                    image: image,
+                    caption: caption,
+                    image_alt:image_alt,
+                    image_class:image_class,
+                    position: 0
+                }
+                article_content_items.images.push(imageData);
             }
             article_content.push(article_content_items);
         }else{
@@ -98,27 +125,74 @@ const extractArticleContents = ($, selector) => {
                     let article_content_items = {
                         heading: header,
                         content: [],
+                        images:[],
+                        quotes:[],
+                        videos:[]
                     };
                     article_content.push(article_content_items);
                 }else{
                     try{
-                        const paragraph = $(data).text().trim() || null;
-                        article_content.at(-1).content.push(paragraph);
+                        const paragraph = $(data).text().trim() || null; //first paragraph came with out header
+                        if(paragraph !== null)
+                            article_content.at(-1).content.push(paragraph);
                     }catch(ex){
                         const paragraph = $(data).text().trim() || null;
                         let article_content_items = {
                             heading: null,
                             content: [],
+                            images:[],
+                            quotes:[],
+                            videos:[]
                         };
-                        article_content_items.content.push(paragraph);
+                        if(paragraph !== null)
+                            article_content_items.content.push(paragraph);
                         article_content.push(article_content_items);
                         //console.log(articleLink)
                     }
                 }
             }
+            const imageUrls=$('img',node);
+            if(imageUrls.length!==0){
+                const image = $('img',node)[0].attribs.src || null;
+                const image_alt = $('img',node)[0].attribs.alt || null;
+                const image_class = $('img',node)[0].attribs.class || null;
+                const caption = $('.image-caption-inner',node).text() || null;
+                const imageData = {
+                    image: image,
+                    caption: caption,
+                    image_alt:image_alt,
+                    image_class:image_class,
+                    position: article_content.at(-1).content.length+1
+                }
+                article_content.at(-1).images.push(imageData);
+            }
         }
-    }
+
+        
+        if(isQuotePresent!==null){
+            const quote_data = {};
+            for (let quote_node of $(node).toArray()) {
+                const tweetable_quote = $('.tweetable-quote',quote_node).text() || null;
+                const author = $('.tweetable-quote-author',quote_node).text() || null;
+                const title = $('.tweetable-quote-author-title',quote_node).text() || null;
+                quote_data["tweetable_quote"]=tweetable_quote;
+                quote_data["author"]=author;
+                quote_data["title"]=title;
+                quote_data["position"]=article_content.at(-1).content.length+1;
+            }
+            article_content.at(-1).quotes.push(quote_data);
+        }
+
+        const video = extractVideo($,node);
+        if(!isEmptyObject(video)){
+            video['position']=article_content.at(-1).content.length+1;
+            article_content.at(-1).videos.push(video)
+        }
+    }   
     return article_content;
+}
+const isEmptyObject=(obj)=>{
+    return JSON.stringify(obj) === '{}'
 }
 
 const extractWrapperImages = ($, selector,key) =>{
@@ -150,7 +224,7 @@ const extractQuote = ($,selector) =>{
 
 const extractVideo = ($,selector)=>{
     const videoLink = {};
-    $('iframe').each((index, element) => {
+    $('iframe',selector).each((index, element) => {
         const $element = $(element);
         videoLink['src']= $element.attr('src');
         videoLink['title'] = $element.attr('title');
