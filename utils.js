@@ -60,6 +60,10 @@ const extractArticlePageDetails = ($,articleLink) =>{
          parsedValue = extractArticleContents($, selector);
         }
 
+        if(key == "related_post"){
+            parsedValue = extractRelatedPost($,selector);
+        }
+
         if (key === "wrapper_image" || key === "block_image") {
             parsedValue = extractWrapperImages($, selector,key);
         }
@@ -70,6 +74,7 @@ const extractArticlePageDetails = ($,articleLink) =>{
         if(key === 'video'){
             parsedValue = extractVideo($,selector);
         }
+
 
         if(key == "block_image" && parsedValue.length>=1){
             articlePageData["wrapper_image"] = parsedValue;
@@ -82,7 +87,21 @@ const extractArticlePageDetails = ($,articleLink) =>{
     articlePageData['link']=articleLink;
     return articlePageData;
 }
-
+const extractRelatedPost = ($,selector)=>{
+    const related_post = [];
+    for (let node of $(selector).toArray()){
+        $('a',node).each((index, element) => {
+            const $element = $(element);
+            const post = {
+                href: $element.attr('href') || null,
+                image: $element.find('source').attr('srcset') || null,
+                title: $element.find('h3').text() || null,
+                category: $element.find('span').text() || null
+            }
+            related_post.push(post);
+         })
+    }
+}
 const extractArticleContents = ($, selector) => {
     const article_content = [];
     for (let node of $(selector).toArray()) {
@@ -90,96 +109,59 @@ const extractArticleContents = ($, selector) => {
         let header = $("h2", node)?.text().trim() || null;
         if(isQuotePresent == null)
         if(header === null && article_content.length == 0){
-            let article_content_items = {
-                heading: header,
-                content: [],
-                images:[],
-                quotes:[],
-                videos:[]
-            };
-            for (let data of $("p", node).toArray()){
-                const paragraph = $(data).text().trim()||null;
-                if(paragraph !== null)
-                article_content_items.content.push(paragraph);
+            let article_content_items = createObject(header);
+            for (let data of $("p,ul", node).toArray()){
+                if(data.name === 'p'){
+                    const paragraph = $(data).text().trim()||null;
+                    if(paragraph !== null)
+                    article_content_items.content.push(paragraph);
+                }
+
+                if(data.name === 'ul'){
+                    const liList =retriveUlList($,data, article_content_items.content.length+1);
+                    article_content_items.ul.push(liList);
+                }
             }
             const imageUrls=$('img',node);
             if(imageUrls.length!==0){
-                const image = $('img',node)[0].attribs.src || null;
-                const caption = $('.image-caption-inner',node).text() || null;
-                const image_alt = $('img',node)[0].attribs.alt || null;
-                const image_class = $('img',node)[0].attribs.class || null;
-                const imageData = {
-                    image: image,
-                    caption: caption,
-                    image_alt:image_alt,
-                    image_class:image_class,
-                    position: 0
-                }
+                const imageData = retriveImage($,node,0)
                 article_content_items.images.push(imageData);
             }
             article_content.push(article_content_items);
         }else{
-            for (let data of $("h2,p", node).toArray()){
+            for (let data of $("h2,p,ul", node).toArray()){
                 if(data.name === "h2"){
                     header = $(data).text().trim() || null;
-                    let article_content_items = {
-                        heading: header,
-                        content: [],
-                        images:[],
-                        quotes:[],
-                        videos:[]
-                    };
+                    let article_content_items = createObject(header);
                     article_content.push(article_content_items);
-                }else{
+                }else if(data.name == 'p'){
                     try{
                         const paragraph = $(data).text().trim() || null; //first paragraph came with out header
                         if(paragraph !== null)
                             article_content.at(-1).content.push(paragraph);
                     }catch(ex){
                         const paragraph = $(data).text().trim() || null;
-                        let article_content_items = {
-                            heading: null,
-                            content: [],
-                            images:[],
-                            quotes:[],
-                            videos:[]
-                        };
+                        let article_content_items = createObject(null);
                         if(paragraph !== null)
                             article_content_items.content.push(paragraph);
                         article_content.push(article_content_items);
-                        //console.log(articleLink)
                     }
+                }
+                if(data.name === 'ul'){
+                    const liList =retriveUlList($,data,article_content.at(-1).content.length+1);
+                    article_content.at(-1).ul.push(liList);
                 }
             }
             const imageUrls=$('img',node);
             if(imageUrls.length!==0){
-                const image = $('img',node)[0].attribs.src || null;
-                const image_alt = $('img',node)[0].attribs.alt || null;
-                const image_class = $('img',node)[0].attribs.class || null;
-                const caption = $('.image-caption-inner',node).text() || null;
-                const imageData = {
-                    image: image,
-                    caption: caption,
-                    image_alt:image_alt,
-                    image_class:image_class,
-                    position: article_content.at(-1).content.length+1
-                }
+                const imageData = retriveImage($,node,article_content.at(-1).content.length+1)
                 article_content.at(-1).images.push(imageData);
             }
         }
 
         
         if(isQuotePresent!==null){
-            const quote_data = {};
-            for (let quote_node of $(node).toArray()) {
-                const tweetable_quote = $('.tweetable-quote',quote_node).text() || null;
-                const author = $('.tweetable-quote-author',quote_node).text() || null;
-                const title = $('.tweetable-quote-author-title',quote_node).text() || null;
-                quote_data["tweetable_quote"]=tweetable_quote;
-                quote_data["author"]=author;
-                quote_data["title"]=title;
-                quote_data["position"]=article_content.at(-1).content.length+1;
-            }
+            const quote_data = retirveQuotes($,node,article_content.at(-1).content.length + 1);
             article_content.at(-1).quotes.push(quote_data);
         }
 
@@ -190,6 +172,57 @@ const extractArticleContents = ($, selector) => {
         }
     }   
     return article_content;
+}
+
+const retirveQuotes = ($,node,position)=>{
+    const quote_data = {};
+    for (let quote_node of $(node).toArray()) {
+        const tweetable_quote = $('.tweetable-quote', quote_node).text() || null;
+        const author = $('.tweetable-quote-author', quote_node).text() || null;
+        const title = $('.tweetable-quote-author-title', quote_node).text() || null;
+        quote_data["tweetable_quote"] = tweetable_quote;
+        quote_data["author"] = author;
+        quote_data["title"] = title;
+        quote_data["position"] = position;
+    }
+    return quote_data;
+}
+const createObject = (header)=>{
+    let article_content_items = {
+        heading: header,
+        content: [],
+        ul:[],
+        images:[],
+        quotes:[],
+        videos:[]
+    };
+    return article_content_items;
+}
+const retriveImage = ($,node,pos)=>{
+    const image = $('img',node)[0].attribs.src || null;
+    const image_alt = $('img',node)[0].attribs.alt || null;
+    const image_class = $('img',node)[0].attribs.class || null;
+    const caption = $('.image-caption-inner',node).text() || null;
+    const imageData = {
+        image: image,
+        caption: caption,
+        image_alt:image_alt,
+        image_class:image_class,
+        position: pos
+    }
+    return imageData;
+} 
+const retriveUlList = ($,data,pos)=>{
+    const li = [];
+
+    $('li', data).each((index, el) => {
+        li.push($(el).text().trim());
+    });
+    const liList = {
+        li: li,
+        position: pos
+    }
+    return liList;
 }
 const isEmptyObject=(obj)=>{
     return JSON.stringify(obj) === '{}'
