@@ -107,53 +107,92 @@ const extractArticleContents = ($, selector) => {
     for (let node of $(selector).toArray()) {
         const isQuotePresent =$('.tweetable-quote',node).text() || null;
         let header = $("h2", node)?.text().trim() || null;
-        if(isQuotePresent == null)
+        
+        const isCtaPresent = $(node).find('.pacecore-cta-heading').text() || null;
+        const isPostAction = $(node).find('.post-call-to-action-container-body-text').text() || null; 
+        
+        if(isQuotePresent == null && isCtaPresent == null && isPostAction == null)
         if(header === null && article_content.length == 0){
             let article_content_items = createObject(header);
-            for (let data of $("p,ul", node).toArray()){
+            for (let data of $("p,ul,ol", node).toArray()){
                 if(data.name === 'p'){
-                    const paragraph = $(data).text().trim()||null;
+                    let paragraph = $(data).text().trim()||null;
+                    paragraph = addStrongTag($,paragraph,data);
                     if(paragraph !== null)
                     article_content_items.content.push(paragraph);
+                    const links = retriveLinks($,data);
+                    if(links.length !==0){
+                        article_content_items.links.concat(links)
+                    }
                 }
 
                 if(data.name === 'ul'){
                     const liList =retriveUlList($,data, article_content_items.content.length+1);
                     article_content_items.ul.push(liList);
                 }
+                if(data.name === 'ol'){
+                    const liList =retriveUlList($,data, article_content_items.content.length+1);
+                    article_content_items.ol.push(liList);
+                }
             }
+
+            const carouselData = $('.gallery-carousel-item',node).find('figure');
+            if(carouselData.length !== 0){
+                const carousel = retivecarouselItem($,carouselData,0)
+                article_content_items.carousels.push(carousel);
+            }
+
             const imageUrls=$('img',node);
-            if(imageUrls.length!==0){
+            if(carouselData.length === 0 && imageUrls.length!==0){
                 const imageData = retriveImage($,node,0)
                 article_content_items.images.push(imageData);
             }
+           
             article_content.push(article_content_items);
         }else{
-            for (let data of $("h2,p,ul", node).toArray()){
+            for (let data of $("h2,p,ul,ol", node).toArray()){
                 if(data.name === "h2"){
                     header = $(data).text().trim() || null;
                     let article_content_items = createObject(header);
                     article_content.push(article_content_items);
                 }else if(data.name == 'p'){
                     try{
-                        const paragraph = $(data).text().trim() || null; //first paragraph came with out header
+                        let paragraph = $(data).text().trim() || null; //first paragraph came with out header
+                        paragraph = addStrongTag($,paragraph,data);
                         if(paragraph !== null)
                             article_content.at(-1).content.push(paragraph);
                     }catch(ex){
-                        const paragraph = $(data).text().trim() || null;
+                        let paragraph = $(data).text().trim() || null;
+                        paragraph = addStrongTag($,paragraph,data);
                         let article_content_items = createObject(null);
                         if(paragraph !== null)
                             article_content_items.content.push(paragraph);
                         article_content.push(article_content_items);
                     }
+                    const links = retriveLinks($,data);
+                    if(links.length !==0){
+                        //destinationArray.push(...sourceArray.map(obj => copy(obj)));
+                        article_content.at(-1).links.push(...links.map(obj => obj))
+                    }            
                 }
                 if(data.name === 'ul'){
                     const liList =retriveUlList($,data,article_content.at(-1).content.length+1);
                     article_content.at(-1).ul.push(liList);
                 }
+                if(data.name === 'ol'){
+                    const liList =retriveUlList($,data, article_content.at(-1).content.length+1);
+                    article_content.at(-1).ol.push(liList);
+                }
             }
+
+            const carouselData = $('.gallery-carousel-item',node).find('figure');
+            if(carouselData.length !== 0){
+                const carousel = retivecarouselItem($,carouselData,article_content.at(-1).content.length+1)
+                article_content.at(-1).carousels.push(carousel);
+            }
+
             const imageUrls=$('img',node);
-            if(imageUrls.length!==0){
+            if(carouselData.length === 0 && imageUrls.length!==0){
                 const imageData = retriveImage($,node,article_content.at(-1).content.length+1)
                 article_content.at(-1).images.push(imageData);
             }
@@ -170,10 +209,90 @@ const extractArticleContents = ($, selector) => {
             video['position']=article_content.at(-1).content.length+1;
             article_content.at(-1).videos.push(video)
         }
+
+        if(isCtaPresent !==null ){
+           const cta = retiveCallToAcctions($,node);
+           article_content.at(-1).CTA=cta;
+        }
+
+        if(isPostAction !== null){
+            const action = retivePostCallToAcctions($,node);
+            article_content.at(-1).action=action;
+        }
     }   
     return article_content;
 }
 
+const retivecarouselItem = ($,carouselData,pos)=>{
+    const carouselIteam = [];
+    carouselData.each((index,element)=>{
+        const image = $('img',element)[0].attribs.src || null;
+        const image_alt = $('img',element)[0].attribs.alt || null;
+        const image_class = $('img',element)[0].attribs.class || null;
+        const caption = $('.image-caption-inner',element).text() || null;
+        const imageData = {
+            image: image,
+            caption: caption,
+            image_alt: image_alt,
+            image_class: image_class,
+        }
+        carouselIteam.push(imageData)
+    })
+    const carousels = {
+        carousels : carouselIteam,
+        position : pos
+    }
+    return carousels;
+}
+const retiveCallToAcctions = ($,node)=>{
+    const CTA = {};
+
+    CTA['link'] = $(node).find('a').attr('href');
+    CTA['heading'] = $(node).find('.pacecore-cta-heading').text() || null;
+    CTA['container'] = $(node).find('.cta-link-container').text() || null;
+    CTA['body'] = $(node).find('.pacecore-cta-body-text').text() || null;
+    CTA['image'] = $(node).find('img')[0].attribs.src || null;
+    CTA['alt'] = $(node).find('img')[0].attribs.alt || null;
+    return CTA;
+}
+const retivePostCallToAcctions = ($,node)=>{
+    const action = {};
+
+    action['link'] = $(node).find('a').attr('href');
+    action['category'] = $(node).find('.post-call-to-action-category').text() || null;
+    action['heading'] = $(node).find('.post-call-to-action-heading').text() || null;
+    action['body'] = $(node).find('.post-call-to-action-body-text').text() || null;
+    action['image'] = $(node).find('img')[0].attribs.src || null;
+    action['alt'] = $(node).find('img')[0].attribs.alt || null;
+    return action;
+}
+
+const retriveLinks = ($,data)=>{
+    const links = [];
+    $('a', data).each((index, element) => {
+        const title= $(element).text().trim() || null;
+        if(title !== null){
+            const link = {
+                link: $(element).attr('href'),
+                title: $(element).text().trim()
+            }
+            links.push(link);
+        }
+    })
+    return links;
+}
+const addStrongTag = ($,paragraph,data)=>{
+    const strong = {};
+    for (let element of $("strong", data).toArray()) {
+        const strongTag = $(element).text().trim() || null;
+        if (strongTag !== null)
+            strong[strongTag] = '<strong>' + strongTag + '</strong>'
+    }
+    Object.keys(strong).forEach((key) => {
+        paragraph = paragraph.replace(key, strong[key]);
+    })
+    return paragraph;
+}
 const retirveQuotes = ($,node,position)=>{
     const quote_data = {};
     for (let quote_node of $(node).toArray()) {
@@ -192,9 +311,14 @@ const createObject = (header)=>{
         heading: header,
         content: [],
         ul:[],
+        ol:[],
         images:[],
+        carousels:[],
         quotes:[],
-        videos:[]
+        videos:[],
+        links:[],
+        CTA:{},
+        action:{}
     };
     return article_content_items;
 }
@@ -203,11 +327,16 @@ const retriveImage = ($,node,pos)=>{
     const image_alt = $('img',node)[0].attribs.alt || null;
     const image_class = $('img',node)[0].attribs.class || null;
     const caption = $('.image-caption-inner',node).text() || null;
+    let href = null;
+    $('a',node).each((index, element) => {
+        href = $(element).attr('href') || null
+    })
     const imageData = {
         image: image,
         caption: caption,
         image_alt:image_alt,
         image_class:image_class,
+        href: href,
         position: pos
     }
     return imageData;
@@ -216,7 +345,12 @@ const retriveUlList = ($,data,pos)=>{
     const li = [];
 
     $('li', data).each((index, el) => {
-        li.push($(el).text().trim());
+        let strongTag = $('strong', el).text().trim()||null;
+        let liData = $(el).text().trim();
+        if(strongTag !== null){
+            liData = liData.replace(strongTag,'<strong>' + strongTag + '</strong> ')
+        }
+        li.push(liData);
     });
     const liList = {
         li: li,
