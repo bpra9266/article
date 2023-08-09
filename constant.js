@@ -19,7 +19,7 @@
 //export const BASE_URL = 'https://foodie.sysco.com/resources-and-services/operations/ground-beef-safety-handling/'
 //export const BASE_URL = 'https://foodie.sysco.com/resources-and-services/operations/controlling-oil-costs/'; 
 //export const BASE_URL =  'https://foodie.sysco.com/resources-and-services/operations/profit-pitfalls/'
-//export const BASE_URL =  'https://foodie.sysco.com/resources-and-services/operations/a-fresh-take-on-takeout/'
+export const BASE_URL =  'https://foodie.sysco.com/resources-and-services/operations/a-fresh-take-on-takeout/'
 //export const BASE_URL = 'https://foodie.sysco.com/brand-spotlight/earth-plus/'
 
 //Tips url
@@ -30,5 +30,3 @@
 //export const BASE_URL = 'https://foodie.sysco.com/sysco-foodie/spring-into-flavor/tips-for-building-a-better-brunch/'
 
 
-//cutting edge solution
-export const BASE_URL = 'https://foodie.sysco.com/new-spring-2023-cutting-edge-solutions/casa-solana-classic-beef-birria/'

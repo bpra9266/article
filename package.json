@@ -5,7 +5,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node jobs/scraping.js"
+    "start:article": "node jobs/scraping.js",
+    "start:edge": "node jobs/edge-sceaping.js"
   },
   "author": "",
   "license": "ISC",

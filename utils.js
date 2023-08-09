@@ -171,7 +171,6 @@ const extractArticleContents = ($, selector) => {
                     }
                     const links = retriveLinks($,data);
                     if(links.length !==0){
-                        //destinationArray.push(...sourceArray.map(obj => copy(obj)));
                         article_content.at(-1).links.push(...links.map(obj => obj))
                     }            
                 }
@@ -251,8 +250,14 @@ const retiveCallToAcctions = ($,node)=>{
     CTA['heading'] = $(node).find('.pacecore-cta-heading').text() || null;
     CTA['container'] = $(node).find('.cta-link-container').text() || null;
     CTA['body'] = $(node).find('.pacecore-cta-body-text').text() || null;
-    CTA['image'] = $(node).find('img')[0].attribs.src || null;
-    CTA['alt'] = $(node).find('img')[0].attribs.alt || null;
+    if($(node).find('img').length !== 0){
+        CTA['image'] = $(node).find('img')[0].attribs.src || null;
+        CTA['alt'] = $(node).find('img')[0].attribs.alt || null;
+    }else{
+        CTA['image'] = null;
+        CTA['alt'] =null
+    }
+
     return CTA;
 }
 const retivePostCallToAcctions = ($,node)=>{
@@ -434,3 +439,7 @@ export const readDataFromXL = async()=> {
     })
     return articleList;
 }
+
+export const readDataFromJSON = (inputFilePath) => {
+    return JSON.parse(fs.readFileSync(inputFilePath, "utf-8"));
+};

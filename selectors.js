@@ -23,3 +23,22 @@ export const selectors = {
     //quote: SELECTOR_QUOTE,
     //video: SELECTOR_VIDEO
 }
+
+//CUTTING EDGE SOLUTION SELECTOR
+const SELECTOR_PAGE_HEADER = '.page-header';
+const SELECTOR_CONTENT = '#pacecore_fmt_0';
+const SELECTOR_SECTION_HEADER = '#pacecore_fmt_1';
+const SELECTOR_SECTION_HEADER_LIST = '#pacecore_fmt_2';
+const SELECTOR_SECTION_HEADER_1 = '#pacecore_fmt_3';
+const SELECTOR_SECTION_HEADER_1_CARD = '#pacecore_fmt_4';
+const SELECTOR_SECTION_FEATURE_PRODUCT = '#cta-featured-products-5';
+
+export const edgeSelectors = {
+    page_header: SELECTOR_PAGE_HEADER,
+    content: SELECTOR_CONTENT,
+    section_header: SELECTOR_SECTION_HEADER,
+    //section_header_list: SELECTOR_SECTION_HEADER_LIST,
+    section_header_1: SELECTOR_SECTION_HEADER_1,
+    //section_header_1_card: SELECTOR_SECTION_HEADER_1_CARD,
+    feature_product: SELECTOR_SECTION_FEATURE_PRODUCT,
+}
