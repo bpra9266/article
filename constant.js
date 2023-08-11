@@ -1,5 +1,5 @@
 //Talent url
-//export const BASE_URL = 'https://foodie.sysco.com/testimonials/vs-kitchen/'
+export const BASE_URL = 'https://foodie.sysco.com/testimonials/vs-kitchen/'
 //export const BASE_URL = 'https://foodie.sysco.com/testimonials/zzq-texas-craft-barbeque/';
 //export const BASE_URL = 'https://foodie.sysco.com/testimonials/supplier-profiles/sweet-street/';
 //export const BASE_URL = 'https://foodie.sysco.com/testimonials/syscos-culinary-experts/chef-marcus-means/';
@@ -19,9 +19,11 @@
 //export const BASE_URL = 'https://foodie.sysco.com/resources-and-services/operations/ground-beef-safety-handling/'
 //export const BASE_URL = 'https://foodie.sysco.com/resources-and-services/operations/controlling-oil-costs/'; 
 //export const BASE_URL =  'https://foodie.sysco.com/resources-and-services/operations/profit-pitfalls/'
-export const BASE_URL =  'https://foodie.sysco.com/resources-and-services/operations/a-fresh-take-on-takeout/'
+//export const BASE_URL =  'https://foodie.sysco.com/resources-and-services/operations/a-fresh-take-on-takeout/'
 //export const BASE_URL = 'https://foodie.sysco.com/brand-spotlight/earth-plus/'
 
+//export const BASE_URL =  'https://foodie.sysco.com/sysco-foodie/spring-into-flavor/making-brunch-as-profitable-as-possible/'
+//export const BASE_URL = 'https://foodie.sysco.com/sysco-foodie/spring-into-flavor/how-to-best-package-your-take-out-and-delivery/'
 //Tips url
 
 //export const BASE_URL = 'https://foodie.sysco.com/tips-and-trends/introducing-new-sysco-imperial-mccormick-spices/' //cauresel

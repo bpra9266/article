@@ -25,6 +25,7 @@ export const selectors = {
 }
 
 //CUTTING EDGE SOLUTION SELECTOR
+const SELECTOR_EDGE_WPID = '*';
 const SELECTOR_PAGE_HEADER = '.page-header';
 const SELECTOR_CONTENT = '#pacecore_fmt_0';
 const SELECTOR_SECTION_HEADER = '#pacecore_fmt_1';
@@ -34,6 +35,7 @@ const SELECTOR_SECTION_HEADER_1_CARD = '#pacecore_fmt_4';
 const SELECTOR_SECTION_FEATURE_PRODUCT = '#cta-featured-products-5';
 
 export const edgeSelectors = {
+    wpid: SELECTOR_EDGE_WPID,
     page_header: SELECTOR_PAGE_HEADER,
     content: SELECTOR_CONTENT,
     section_header: SELECTOR_SECTION_HEADER,

@@ -16,7 +16,9 @@ export const extractArticlePageData = async(
             uri:articleLink,
             callback: (error,response,done)=>{
                 if(error || response.statusCode !== 200){
-                    console.log(`An error occurred while fetching article page data`);
+                    console.log('link : ',articleLink)
+                    console.log(`An error occurred while fetching article page data`,error);
+                    console.log('-----------------------------------------------------')
                     resolve(
                         Object.keys(selectors).reduce((articlePageDetails, key) => {
                             articlePageDetails[key] = null;
@@ -103,7 +105,7 @@ const extractRelatedPost = ($,selector)=>{
     }
 }
 const extractArticleContents = ($, selector) => {
-    const article_content = [];
+    let article_content = [];
     for (let node of $(selector).toArray()) {
         const isQuotePresent =$('.tweetable-quote',node).text() || null;
         let header = $("h2", node)?.text().trim() || null;
@@ -218,7 +220,27 @@ const extractArticleContents = ($, selector) => {
             const action = retivePostCallToAcctions($,node);
             article_content.at(-1).action=action;
         }
-    }   
+    } 
+    article_content = article_content.filter((data)=>{
+        const heading = data.heading;
+        const content = data.content;
+        const ul = data.ul;
+        const ol = data.ol;
+        const images = data.images;
+        const carousels = data.carousels;
+        const quotes = data.quotes;
+        const videos = data.videos;
+        const links = data.links;
+        const CTA = data.CTA;
+        const action = data.action;
+        if (heading === null && content.length === 0 && ul.length === 0 && ol.length === 0 && 
+            images.length === 0 && carousels.length === 0 && quotes.length === 0 && 
+            videos.length === 0 && isEmptyObject(CTA) && isEmptyObject(action)) {
+                return false;
+        }
+        return true;
+    })
+      
     return article_content;
 }
 
@@ -434,7 +456,7 @@ export const readDataFromXL = async()=> {
     const worksheet = workbook.Sheets["Sheet1"];
     const articleList = XLSX.utils.sheet_to_json(worksheet, {
         raw: true,
-        range: "A1:A83",
+        range: "A1:A208",
         defval: null,
     })
     return articleList;

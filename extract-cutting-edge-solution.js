@@ -11,7 +11,9 @@ export const extractCuttingEdgeSolutionPageData = async(
             uri:articleLink,
             callback: (error,response,done)=>{
                 if(error || response.statusCode !== 200){
-                    console.log(`An error occurred while fetching article page data`);
+                    console.log('link : ',articleLink)
+                    console.log(`An error occurred while fetching cutting edge page data`,error);
+                    console.log('-----------------------------------------------------')
                     resolve(
                         Object.keys(edgeSelectors).reduce((articlePageDetails, key) => {
                             articlePageDetails[key] = null;
@@ -35,6 +37,16 @@ const extractArticlePageDetails = ($,articleLink)=>{
        
         if (parsedValue === "") {
             parsedValue = null;
+        }
+        if(key == 'wpid'){
+            
+            let classes = $('body', selector)[0].attribs.class;
+            const index = classes.indexOf('page-id')
+            classes = classes.substring(index)
+
+            const data = classes.split(" ");
+            parsedValue = data[0].substring(8);
+            
         }
         if(key == 'page_header'){
             parsedValue = retrivePageHeader($,selector);
