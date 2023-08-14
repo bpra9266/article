@@ -1,9 +1,19 @@
-import { readDataFromJSON } from "../utils.js";
+import { readDataFromJSON ,writeDataToJSON} from "../utils.js";
 import path from "path";
 //import path from "../data/cutting-edge-response.json";
 
-const articleData = readDataFromJSON("../data/cutting-edge-response.json");
+const articleData = readDataFromJSON("../data/curring-edge.json");
 
+const retriveData = ()=>{
+    const images = [];
+    //console.log(articleData[0])
+    for(const article of articleData){
+        const data = retirveImageData(article);
+        images.push(...data.map(d=>d));
+    }
+
+    writeDataToJSON("../data/article-edge/images.json", images);
+}
 const retirveImageData = (articleData)=>{
     
     let images = [];
@@ -37,4 +47,6 @@ const getImage = (wpid,slug,imageUrl)=>{
 const retriveSlug = (imageUrl)=>{
     return path.basename(path.basename(imageUrl), path.extname(imageUrl));
 }
-console.log(retirveImageData(articleData));
+//console.log(retirveImageData(articleData));
+
+retriveData();

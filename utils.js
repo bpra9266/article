@@ -385,7 +385,7 @@ const retriveUlList = ($,data,pos)=>{
     }
     return liList;
 }
-const isEmptyObject=(obj)=>{
+export const isEmptyObject=(obj)=>{
     return JSON.stringify(obj) === '{}'
 }
 
@@ -456,7 +456,7 @@ export const readDataFromXL = async()=> {
     const worksheet = workbook.Sheets["Sheet1"];
     const articleList = XLSX.utils.sheet_to_json(worksheet, {
         raw: true,
-        range: "A1:A208",
+        range: "A1:A206",
         defval: null,
     })
     return articleList;
@@ -464,4 +464,41 @@ export const readDataFromXL = async()=> {
 
 export const readDataFromJSON = (inputFilePath) => {
     return JSON.parse(fs.readFileSync(inputFilePath, "utf-8"));
+};
+
+export const downloadAsset = async (crawler, assetUrl, filePath) => {
+    return new Promise((resolve) => {
+        crawler.queue({
+            uri: assetUrl,
+            filePath,
+            callback: (error, response, done) => {
+                if (error) {
+                    console.error(error);
+                } else {
+                    fs.mkdir(path.dirname(filePath), { recursive: true }, (error) => {
+                        if (error) {
+                            console.error(
+                                `Failed to create non existing directories in the output file path ${filePath}`
+                            );
+                        } else {
+                            fs.createWriteStream(response.options.filePath).write(
+                                response.body
+                            );
+                        }
+                    });
+                }
+                resolve();
+                done();
+            },
+        });
+    });
+};
+
+export const getDuration = (start, end) => {
+    const diff = end - start;
+    return {
+        seconds: Math.floor((diff / 1_000) % 60),
+        minutes: Math.floor((diff / 60_000) % 60),
+        hours: Math.floor((diff / 3_600_000) % 24),
+    };
 };
