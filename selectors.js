@@ -13,7 +13,7 @@ const SELECTOR_RELATED_POST = '.posts-related';
 export const selectors = {
     wpid: SELECTOR_WPID,
     name: SELECTOR_CHEF_NAME,
-    category: SELECTOR_CATEGORY_TYPE,
+    sub_category: SELECTOR_CATEGORY_TYPE,
     slogan: SELECTOR_ARTICLE_SLOGAN,
     hero_image: SELECTOR_HERO_IMAGE,
     article_content: SELECTOR_ARTICLE_CONTENT,

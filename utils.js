@@ -9,6 +9,7 @@ import XLSX from "xlsx";
 
 export const extractArticlePageData = async(
     articleLink,
+    category,
     crawler
 )=>{
     return new Promise(async (resolve,reject)=>{
@@ -28,16 +29,16 @@ export const extractArticlePageData = async(
                     done();
                     return;
                 }
-                resolve(extractArticlePageDetails(cheerio.load(response.body),articleLink));
+                resolve(extractArticlePageDetails(cheerio.load(response.body),articleLink,category));
                 done();
             }
         })
     })
 }
 
-const extractArticlePageDetails = ($,articleLink) =>{
+const extractArticlePageDetails = ($,articleLink,category) =>{
     const articlePageData = {};
-
+    articlePageData['category'] = category;
     for(let [key,selector] of Object.entries(selectors)){
         let parsedValue = $(selector)?.text().trim() ?? null;
        
@@ -119,13 +120,10 @@ const extractArticleContents = ($, selector) => {
             for (let data of $("p,ul,ol", node).toArray()){
                 if(data.name === 'p'){
                     let paragraph = $(data).text().trim()||null;
+                    paragraph = addLinksTag($,data,paragraph);
                     paragraph = addStrongTag($,paragraph,data);
                     if(paragraph !== null)
                     article_content_items.content.push(paragraph);
-                    const links = retriveLinks($,data);
-                    if(links.length !==0){
-                        article_content_items.links.concat(links)
-                    }
                 }
 
                 if(data.name === 'ul'){
@@ -160,21 +158,19 @@ const extractArticleContents = ($, selector) => {
                 }else if(data.name == 'p'){
                     try{
                         let paragraph = $(data).text().trim() || null; //first paragraph came with out header
+                        paragraph = addLinksTag($,data,paragraph);
                         paragraph = addStrongTag($,paragraph,data);
                         if(paragraph !== null)
                             article_content.at(-1).content.push(paragraph);
                     }catch(ex){
                         let paragraph = $(data).text().trim() || null;
+                        paragraph = addLinksTag($,data,paragraph);
                         paragraph = addStrongTag($,paragraph,data);
                         let article_content_items = createObject(null);
                         if(paragraph !== null)
                             article_content_items.content.push(paragraph);
                         article_content.push(article_content_items);
-                    }
-                    const links = retriveLinks($,data);
-                    if(links.length !==0){
-                        article_content.at(-1).links.push(...links.map(obj => obj))
-                    }            
+                    }         
                 }
                 if(data.name === 'ul'){
                     const liList =retriveUlList($,data,article_content.at(-1).content.length+1);
@@ -212,12 +208,12 @@ const extractArticleContents = ($, selector) => {
         }
 
         if(isCtaPresent !==null ){
-           const cta = retiveCallToAcctions($,node);
+           const cta = retiveCallToAcctions($,node,article_content.at(-1).content.length+1);
            article_content.at(-1).CTA=cta;
         }
 
         if(isPostAction !== null){
-            const action = retivePostCallToAcctions($,node);
+            const action = retivePostCallToAcctions($,node,article_content.at(-1).content.length+1);
             article_content.at(-1).action=action;
         }
     } 
@@ -265,7 +261,7 @@ const retivecarouselItem = ($,carouselData,pos)=>{
     }
     return carousels;
 }
-const retiveCallToAcctions = ($,node)=>{
+const retiveCallToAcctions = ($,node,position)=>{
     const CTA = {};
 
     CTA['link'] = $(node).find('a').attr('href');
@@ -279,10 +275,10 @@ const retiveCallToAcctions = ($,node)=>{
         CTA['image'] = null;
         CTA['alt'] =null
     }
-
+    CTA["position"] = position;
     return CTA;
 }
-const retivePostCallToAcctions = ($,node)=>{
+const retivePostCallToAcctions = ($,node,position)=>{
     const action = {};
 
     action['link'] = $(node).find('a').attr('href');
@@ -291,22 +287,23 @@ const retivePostCallToAcctions = ($,node)=>{
     action['body'] = $(node).find('.post-call-to-action-body-text').text() || null;
     action['image'] = $(node).find('img')[0].attribs.src || null;
     action['alt'] = $(node).find('img')[0].attribs.alt || null;
+    action["position"] = position;
     return action;
 }
 
-const retriveLinks = ($,data)=>{
-    const links = [];
+const addLinksTag = ($,data,paragraph)=>{
+    const links = {};
     $('a', data).each((index, element) => {
         const title= $(element).text().trim() || null;
         if(title !== null){
-            const link = {
-                link: $(element).attr('href'),
-                title: $(element).text().trim()
-            }
-            links.push(link);
+            const link = $(element).attr('href');
+            links[title] = '<a href='+link+'>'+title +'</a>';
         }
     })
-    return links;
+    Object.keys(links).forEach((key) => {
+        paragraph = paragraph.replace(key, links[key]);
+    })
+    return paragraph;
 }
 const addStrongTag = ($,paragraph,data)=>{
     const strong = {};
@@ -456,7 +453,7 @@ export const readDataFromXL = async()=> {
     const worksheet = workbook.Sheets["Sheet1"];
     const articleList = XLSX.utils.sheet_to_json(worksheet, {
         raw: true,
-        range: "A1:A206",
+        range: "A1:B206",
         defval: null,
     })
     return articleList;

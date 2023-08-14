@@ -1,5 +1,5 @@
 //Talent url
-export const BASE_URL = 'https://foodie.sysco.com/testimonials/vs-kitchen/'
+//export const BASE_URL = 'https://foodie.sysco.com/testimonials/vs-kitchen/'
 //export const BASE_URL = 'https://foodie.sysco.com/testimonials/zzq-texas-craft-barbeque/';
 //export const BASE_URL = 'https://foodie.sysco.com/testimonials/supplier-profiles/sweet-street/';
 //export const BASE_URL = 'https://foodie.sysco.com/testimonials/syscos-culinary-experts/chef-marcus-means/';
@@ -12,6 +12,7 @@ export const BASE_URL = 'https://foodie.sysco.com/testimonials/vs-kitchen/'
 
 //export const BASE_URL =  'https://foodie.sysco.com/testimonials/customer-community-stories/zzq-texas-craft-barbeque/';
 
+export const BASE_URL = 'https://foodie.sysco.com/sysco-foodie/spring-into-flavor/how-to-best-package-your-take-out-and-delivery/'//LINKS
 
 //Techniques
 

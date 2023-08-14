@@ -12,13 +12,13 @@ for(const article of extractedArticleList){
         //const  articlePageDataPromise  = await extractCuttingEdgeSolutionPageData(article['Article URL'],crawler);
         //cuttingEdgeList.push(articlePageDataPromise);
     }else{
-        const  articlePageDataPromise  = await extractArticlePageData(article['Article URL'],crawler);
+        const  articlePageDataPromise  = await extractArticlePageData(article['Article URL'],article['Category'],crawler);
         articleList.push(articlePageDataPromise);
     }
 }
-//const  articlePageDataPromise  = await extractArticlePageData(BASE_URL,crawler);
+//const  articlePageDataPromise  = await extractArticlePageData(BASE_URL,"a",crawler);
 //console.log(JSON.stringify(articlePageDataPromise))
-writeDataToJSON("data/article2.json", articleList);
+writeDataToJSON("data/article.json", articleList);
 //writeDataToJSON("data/curring-edge.json", cuttingEdgeList);
 // fs.writeFile('movieData.json',JSON.stringify(articlePageDataPromise),(error)=>{
 //    if(error) throw error;
