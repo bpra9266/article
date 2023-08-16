@@ -12,11 +12,11 @@
 
 //export const BASE_URL =  'https://foodie.sysco.com/testimonials/customer-community-stories/zzq-texas-craft-barbeque/';
 
-export const BASE_URL = 'https://foodie.sysco.com/sysco-foodie/spring-into-flavor/how-to-best-package-your-take-out-and-delivery/'//LINKS
+//export const BASE_URL = 'https://foodie.sysco.com/sysco-foodie/spring-into-flavor/how-to-best-package-your-take-out-and-delivery/'//LINKS
 
 //Techniques
 
-//export const BASE_URL = 'https://foodie.sysco.com/tips-and-trends/soup-sandwich/';
+export const BASE_URL = 'https://foodie.sysco.com/tips-and-trends/soup-sandwich/';
 //export const BASE_URL = 'https://foodie.sysco.com/resources-and-services/operations/ground-beef-safety-handling/'
 //export const BASE_URL = 'https://foodie.sysco.com/resources-and-services/operations/controlling-oil-costs/'; 
 //export const BASE_URL =  'https://foodie.sysco.com/resources-and-services/operations/profit-pitfalls/'

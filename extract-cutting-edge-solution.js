@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 export const extractCuttingEdgeSolutionPageData = async(
     articleLink,
+    category,
     crawler
 )=>{
     return new Promise(async (resolve,reject)=>{
@@ -23,15 +24,15 @@ export const extractCuttingEdgeSolutionPageData = async(
                     done();
                     return;
                 }
-                resolve(extractArticlePageDetails(cheerio.load(response.body),articleLink));
+                resolve(extractArticlePageDetails(cheerio.load(response.body),articleLink,category));
                 done();
             }
         })
     })
 }
-const extractArticlePageDetails = ($,articleLink)=>{
+const extractArticlePageDetails = ($,articleLink,category)=>{
     const articlePageData = {};
-
+    articlePageData["category"] = category;
     for(let [key,selector] of Object.entries(edgeSelectors)){
         let parsedValue = $(selector)?.text().trim() ?? null;
        

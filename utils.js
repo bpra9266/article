@@ -104,6 +104,7 @@ const extractRelatedPost = ($,selector)=>{
             related_post.push(post);
          })
     }
+    return related_post;
 }
 const extractArticleContents = ($, selector) => {
     let article_content = [];
