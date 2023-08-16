@@ -1,7 +1,7 @@
 import { readDataFromJSON ,writeDataToJSON,isEmptyObject} from "../utils.js";
 import path from "path";
 
-const articleData = readDataFromJSON("../data/article2.json");
+const articleData = readDataFromJSON("../data/article.json");
 
 
 const retriveData = ()=>{
@@ -11,7 +11,7 @@ const retriveData = ()=>{
         const data = retirveImageData(article);
         images.push(...data.map(d=>d));
     }
-
+    //images = retirveImageData(articleData);
     writeDataToJSON("../data/article/images.json", images);
 }
 const retirveImageData = (articleData)=>{
@@ -52,6 +52,13 @@ const retirveImageData = (articleData)=>{
             }
         }
 
+    }
+
+    for (const post of articleData.related_post){
+        if(post.image !==null){
+            const image = getImage(wpid, slug, post.image);
+            images.push(image);
+        }
     }
     return images;
 }

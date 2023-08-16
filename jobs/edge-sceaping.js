@@ -9,7 +9,7 @@ import fs from "fs";
 //     const  articlePageDataPromise  = await extractArticlePageData(article['Article URL'],crawler);
 //     articleList.push(articlePageDataPromise);
 // }
-const  articlePageDataPromise  = await extractCuttingEdgeSolutionPageData(BASE_URL,crawler);
+const  articlePageDataPromise  = await extractCuttingEdgeSolutionPageData(BASE_URL,"a",crawler);
 //console.log(JSON.stringify(articlePageDataPromise))
 writeDataToJSON("data/curring-edge.json", articlePageDataPromise);
 
