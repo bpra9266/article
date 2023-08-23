@@ -341,7 +341,6 @@ const createObject = (header)=>{
         carousels:[],
         quotes:[],
         videos:[],
-        links:[],
         CTA:{},
         action:{}
     };

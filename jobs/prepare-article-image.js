@@ -45,7 +45,7 @@ const retirveImageData = (articleData)=>{
                 images.push(image_cta);
             }
         }
-        if(!isEmptyObject(article.CTA)){
+        if(!isEmptyObject(article.action)){
             if(article.action.image !==null && article.action.image !== undefined){
                 const image_action = getImage(wpid, slug, article.action.image);
                 images.push(image_action);

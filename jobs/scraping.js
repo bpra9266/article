@@ -9,8 +9,8 @@ const articleList = [];
 const cuttingEdgeList = [];
 for(const article of extractedArticleList){
     if(article['Article URL'].includes("cutting-edge")){
-        const  articlePageDataPromise  = await extractCuttingEdgeSolutionPageData(article['Article URL'],article['Category'],crawler);
-        cuttingEdgeList.push(articlePageDataPromise);
+        //const  articlePageDataPromise  = await extractCuttingEdgeSolutionPageData(article['Article URL'],article['Category'],crawler);
+        //cuttingEdgeList.push(articlePageDataPromise);
     }else{
         const  articlePageDataPromise  = await extractArticlePageData(article['Article URL'],article['Category'],crawler);
         articleList.push(articlePageDataPromise);

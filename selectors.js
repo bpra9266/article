@@ -44,3 +44,26 @@ export const edgeSelectors = {
     //section_header_1_card: SELECTOR_SECTION_HEADER_1_CARD,
     feature_product: SELECTOR_SECTION_FEATURE_PRODUCT,
 }
+
+//cutting edge home page
+const SELECTOR_HEADER_IMAGE = '.page-header-img';
+const SELECTOR_HEADER_TEXT = '#pacecore_fmt_0';
+const SELECTOR_BILL_BOARD = '.content-billboard';
+const SELECTOR_CAROUSEL = '#pacecore_fmt_2';
+const SELECTOR_BODY = '#pacecore_fmt_4';
+const SELECTOR_PRODUCTS = '#pacecore_fmt_5';
+const SELECTOR_RECIPIES = '#pacecore_fmt_7';
+const SELECTOR_LINK = '#pacecore_fmt_9';
+
+export const edgeHome = {
+    wpid: SELECTOR_EDGE_WPID,
+    header_image:SELECTOR_HEADER_IMAGE,
+    header_text:SELECTOR_HEADER_TEXT,
+    bill_board: SELECTOR_BILL_BOARD,
+    edge_solutions: SELECTOR_CAROUSEL,
+    content_body:SELECTOR_BODY,
+    products:SELECTOR_PRODUCTS,
+    related_recipies: SELECTOR_RECIPIES,
+    link_page:SELECTOR_LINK
+}
+
