@@ -17,22 +17,22 @@ const retriveData = ()=>{
 }
 const retirveImageData = (articleData)=>{
     
-    let images = [];
-    // const wpid = articleData.wpid;
-    // const slug = retriveSlug(articleData.link);
+    let images = []; 
+    const wpid = articleData.wpid;
+    const slug = retriveSlug(articleData.link);
 
-    // const image_header = getImage(wpid, slug,articleData.page_header.image);
-    // images.push(image_header);
+    const image_header = getImage(wpid, slug,articleData.page_header.image);
+    images.push(image_header);
 
-    // for (const article of articleData.section_header_1.card) {
-    //     const image = getImage(wpid, slug,article.image);
-    //     images.push(image);
-    // }
+    for (const article of articleData.recipes.card) {
+        const image = getImage(wpid, slug,article.image);
+        images.push(image);
+    }
 
     //for feature_product
-    for (const article of articleData.feature_product) {
-        const slug = "feature_product_image"
-        const image = getImage1(slug,article.image);
+    for (const article of articleData.feature_products) {
+        const sluG = "feature_product_image"
+        const image = getImage1(sluG,article.image);
         const name = article.image.substring(START.length,article.image.indexOf(END));
         image["name"] = name;
         images.push(image);

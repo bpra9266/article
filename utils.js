@@ -35,7 +35,17 @@ export const extractArticlePageData = async(
         })
     })
 }
-
+const getUTCTimestampStr = (timestampStr) => {
+    if (!timestampStr) {
+        return timestampStr;
+    }
+    if (/Z$/i.test(timestampStr)) {
+        return timestampStr;
+    } else {
+        return timestampStr.substr(0, timestampStr.indexOf('+')) + timestampStr.substr(timestampStr.indexOf('+') + 3) + 'Z'
+        //return timestampStr + "Z";
+    }
+};
 const extractArticlePageDetails = ($,articleLink,category) =>{
     const articlePageData = {};
     articlePageData['category'] = category;
@@ -51,6 +61,14 @@ const extractArticlePageDetails = ($,articleLink,category) =>{
                 const id = $element.attr('id').substring(5);
                 parsedValue = id;
             });
+        }
+        if(key == 'created_gmt'){
+            const json = JSON.parse($(selector).text());
+            parsedValue = getUTCTimestampStr(json['@graph'][0].datePublished);
+        }
+        if(key == 'modified_gmt'){
+            const json = JSON.parse($(selector).text());
+            parsedValue = getUTCTimestampStr(json['@graph'][0].dateModified);
         }
         if(key == 'hero_image'){
             if($(selector).find('img').length!==0){
@@ -210,7 +228,7 @@ const extractArticleContents = ($, selector) => {
 
         if(isCtaPresent !==null ){
            const cta = retiveCallToAcctions($,node,article_content.at(-1).content.length+1);
-           article_content.at(-1).CTA=cta;
+           article_content.at(-1).cta=cta;
         }
 
         if(isPostAction !== null){
@@ -228,11 +246,11 @@ const extractArticleContents = ($, selector) => {
         const quotes = data.quotes;
         const videos = data.videos;
         const links = data.links;
-        const CTA = data.CTA;
+        const cta = data.cta;
         const action = data.action;
         if (heading === null && content.length === 0 && ul.length === 0 && ol.length === 0 && 
             images.length === 0 && carousels.length === 0 && quotes.length === 0 && 
-            videos.length === 0 && isEmptyObject(CTA) && isEmptyObject(action)) {
+            videos.length === 0 && isEmptyObject(cta) && isEmptyObject(action)) {
                 return false;
         }
         return true;
@@ -263,21 +281,21 @@ const retivecarouselItem = ($,carouselData,pos)=>{
     return carousels;
 }
 const retiveCallToAcctions = ($,node,position)=>{
-    const CTA = {};
+    const cta = {};
 
-    CTA['link'] = $(node).find('a').attr('href');
-    CTA['heading'] = $(node).find('.pacecore-cta-heading').text() || null;
-    CTA['container'] = $(node).find('.cta-link-container').text() || null;
-    CTA['body'] = $(node).find('.pacecore-cta-body-text').text() || null;
+    cta['link'] = $(node).find('a').attr('href');
+    cta['heading'] = $(node).find('.pacecore-cta-heading').text() || null;
+    cta['container'] = $(node).find('.cta-link-container').text() || null;
+    cta['body'] = $(node).find('.pacecore-cta-body-text').text() || null;
     if($(node).find('img').length !== 0){
-        CTA['image'] = $(node).find('img')[0].attribs.src || null;
-        CTA['alt'] = $(node).find('img')[0].attribs.alt || null;
+        cta['image'] = $(node).find('img')[0].attribs.src || null;
+        cta['alt'] = $(node).find('img')[0].attribs.alt || null;
     }else{
-        CTA['image'] = null;
-        CTA['alt'] =null
+        cta['image'] = null;
+        cta['alt'] =null
     }
-    CTA["position"] = position;
-    return CTA;
+    cta["position"] = position;
+    return cta;
 }
 const retivePostCallToAcctions = ($,node,position)=>{
     const action = {};
@@ -341,7 +359,7 @@ const createObject = (header)=>{
         carousels:[],
         quotes:[],
         videos:[],
-        CTA:{},
+        cta:{},
         action:{}
     };
     return article_content_items;

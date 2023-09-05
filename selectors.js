@@ -9,9 +9,11 @@ const SELECTOR_QUOTE = '.quote-container';
 const SELECTOR_VIDEO = '.wp-block-pacecore-pacecore-video,.video-container,.wp-block-embed__wrapper';
 const SELECTOR_WPID = '.site-main';
 const SELECTOR_RELATED_POST = '.posts-related';
-
+const SELECTOR_DATE_TIME = '.yoast-schema-graph';
 export const selectors = {
     wpid: SELECTOR_WPID,
+    created_gmt: SELECTOR_DATE_TIME,
+    modified_gmt: SELECTOR_DATE_TIME,
     name: SELECTOR_CHEF_NAME,
     sub_category: SELECTOR_CATEGORY_TYPE,
     slogan: SELECTOR_ARTICLE_SLOGAN,
@@ -36,13 +38,15 @@ const SELECTOR_SECTION_FEATURE_PRODUCT = '#cta-featured-products-5';
 
 export const edgeSelectors = {
     wpid: SELECTOR_EDGE_WPID,
+    created_gmt: SELECTOR_DATE_TIME,
+    modified_gmt: SELECTOR_DATE_TIME,
     page_header: SELECTOR_PAGE_HEADER,
     content: SELECTOR_CONTENT,
     section_header: SELECTOR_SECTION_HEADER,
     //section_header_list: SELECTOR_SECTION_HEADER_LIST,
-    section_header_1: SELECTOR_SECTION_HEADER_1,
+    recipes: SELECTOR_SECTION_HEADER_1,
     //section_header_1_card: SELECTOR_SECTION_HEADER_1_CARD,
-    feature_product: SELECTOR_SECTION_FEATURE_PRODUCT,
+    feature_products: SELECTOR_SECTION_FEATURE_PRODUCT,
 }
 
 //cutting edge home page
@@ -57,6 +61,8 @@ const SELECTOR_LINK = '#pacecore_fmt_9';
 
 export const edgeHome = {
     wpid: SELECTOR_EDGE_WPID,
+    created_gmt: SELECTOR_DATE_TIME,
+    modified_gmt: SELECTOR_DATE_TIME,
     header_image:SELECTOR_HEADER_IMAGE,
     header_text:SELECTOR_HEADER_TEXT,
     bill_board: SELECTOR_BILL_BOARD,

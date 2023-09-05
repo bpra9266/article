@@ -49,6 +49,14 @@ const extractArticlePageDetails = ($,articleLink,category)=>{
             parsedValue = data[0].substring(8);
             
         }
+        if(key == 'created_gmt'){
+            const json = JSON.parse($(selector).text());
+            parsedValue = getUTCTimestampStr(json['@graph'][0].datePublished);
+        }
+        if(key == 'modified_gmt'){
+            const json = JSON.parse($(selector).text());
+            parsedValue = getUTCTimestampStr(json['@graph'][0].dateModified);
+        }
         if(key == 'page_header'){
             parsedValue = retrivePageHeader($,selector);
         }
@@ -59,11 +67,11 @@ const extractArticlePageDetails = ($,articleLink,category)=>{
          parsedValue = retiveSectionHeader($, selector);
         }
 
-        if(key == "section_header_1"){
+        if(key == "recipes"){
             parsedValue = retiveSectionHeader1($,selector);
         }
 
-        if (key === "feature_product") {
+        if (key === "feature_products") {
             parsedValue = extractFeatureProduct($, selector);
         }
         articlePageData[key] = parsedValue;
@@ -71,7 +79,17 @@ const extractArticlePageDetails = ($,articleLink,category)=>{
     articlePageData['link']=articleLink;
     return articlePageData;
 }
-
+const getUTCTimestampStr = (timestampStr) => {
+    if (!timestampStr) {
+        return timestampStr;
+    }
+    if (/Z$/i.test(timestampStr)) {
+        return timestampStr;
+    } else {
+        return timestampStr.substr(0, timestampStr.indexOf('+')) + timestampStr.substr(timestampStr.indexOf('+') + 3) + 'Z'
+        //return timestampStr + "Z";
+    }
+};
 const retrivePageHeader =($,selector)=>{
     const pageHeader = {};
     $('a',selector).each((index, element) => {
@@ -173,6 +191,7 @@ const saveFile = (outputFilePath, data) => {
 //Extract edge solution home page
 export const extractCuttingEdgeSolutionHomePageData = async(
     articleLink,
+    category,
     crawler
 )=>{
     return new Promise(async (resolve,reject)=>{
@@ -192,15 +211,16 @@ export const extractCuttingEdgeSolutionHomePageData = async(
                     done();
                     return;
                 }
-                resolve(extractEdgeHomePage(cheerio.load(response.body),articleLink));
+                resolve(extractEdgeHomePage(cheerio.load(response.body),articleLink,category));
                 done();
             }
         })
     })
 }
 
-const extractEdgeHomePage = ($,articleLink)=>{
+const extractEdgeHomePage = ($,articleLink,category)=>{
     const articlePageData = {};
+    articlePageData['category']=category;
     for(let [key,selector] of Object.entries(edgeHome)){
         let parsedValue = $(selector)?.text().trim() ?? null;
        
@@ -216,6 +236,14 @@ const extractEdgeHomePage = ($,articleLink)=>{
             const data = classes.split(" ");
             parsedValue = data[0].substring(8);
             
+        }
+        if(key == 'created_gmt'){
+            const json = JSON.parse($(selector).text());
+            parsedValue = getUTCTimestampStr(json['@graph'][0].datePublished);
+        }
+        if(key == 'modified_gmt'){
+            const json = JSON.parse($(selector).text());
+            parsedValue = getUTCTimestampStr(json['@graph'][0].dateModified);
         }
         if(key == 'header_image'){
             parsedValue = retriveHeaderImage($,selector);
@@ -318,7 +346,7 @@ const retriveEdgeSoulutions = ($, selector) => {
 
     return {
         title: title,
-        edge_solutions:edges
+        carousel:edges
     }
 }
 
@@ -373,7 +401,7 @@ const retriveRelatedRecipies = ($, selector) => {
     return {
         title:title,
         sub_title:sub_title,
-        related_resipies : recipies
+        resipies : recipies
     }
 }
 
